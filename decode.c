@@ -80,6 +80,7 @@ int get_resource_size(char * data)
 	return (*(int*)(data+12)) + LFD_TAG_HEAD;
 }
 
+/* Print data block header */
 void print_header(char *data,char * buf)
 {
 	char tmp[512];
@@ -100,6 +101,7 @@ void print_header(char *data,char * buf)
 
 }
 
+/* Write data of a blocks to a file */
 int lfd_write(char * data)
 {
         int fd;
@@ -124,6 +126,7 @@ int lfd_write(char * data)
         return wsize+LFD_TAG_HEAD;
 }
 
+/* Called when reading a data blocks of type RMAP */
 void dec_rmap(char * raw_data)
 {
 	int num_res;
@@ -136,6 +139,7 @@ void dec_rmap(char * raw_data)
 	return ;
 }
 
+/* Called when reading a data blocks of type TEXT */
 void dec_text(char * raw_data)
 {
 	char * cur_data;
@@ -153,6 +157,7 @@ void dec_text(char * raw_data)
 	return;
 }
 
+/* Called when reading a data blocks of type CRFT */
 void dec_crft(char * data)
 {
 
@@ -201,8 +206,10 @@ void lfd_decode(const char * file_name)
 	cur_data=raw_data;
 	while( cur_data - raw_data < size ) {
 		printf("%d- ",num_res++);
+		/* Write all data blocks in separate files*/
 		offset = lfd_write(cur_data);
 
+		/* Print information on the data block depending its type */
 		for(i=0;i<LFD_TAG_NUM;i++) {
 			if(strncmp(cur_data,lfd_tag[i],strlen(lfd_tag[i]))==0) {
 				lfd_tag_dec[i](cur_data);
